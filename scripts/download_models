@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -eou pipefail
+
+hf download PaddlePaddle/PP-OCRv6_small_det_onnx --local-dir models/PaddlePaddle/PP-OCRv6_small_det_onnx
+hf download PaddlePaddle/PP-OCRv6_small_rec_onnx --local-dir models/PaddlePaddle/PP-OCRv6_small_rec_onnx
+hf download PaddlePaddle/PP-LCNet_x1_0_textline_ori_onnx --local-dir models/PaddlePaddle/PP-LCNet_x1_0_textline_ori_onnx

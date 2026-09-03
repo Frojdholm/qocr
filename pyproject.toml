@@ -1,0 +1,38 @@
+[project]
+name = "qocr"
+version = "0.1.0"
+description = "Fast OCR engine"
+readme = "README.md"
+authors = [
+    { name = "Hampus Fröjdholm", email = "hampus.frojdholm@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "opencv-python-headless>=5.0.0.93",
+    "pyclipper>=1.4.0",
+    "pyyaml>=6.0.3",
+    "shapely>=2.1.2",
+]
+
+[project.scripts]
+qocr = "qocr:main"
+
+[build-system]
+requires = ["uv_build>=0.12.9,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    { include-group = "gpu" },
+    "huggingface-hub>=1.29.0",
+    "onnxslim>=0.1.96",
+    "rapidocr>=3.9.2",
+    "opencv-python>=5.0.0.93",
+]
+
+gpu = [
+    "cupy-cuda13x[ctk]>=14.2.0",
+    "nvidia-cudnn-cu13>=9.25.1.1",
+    "onnxruntime-gpu>=1.29.0",
+    "tensorrt>=10.0.0,<11.0.0",
+]
