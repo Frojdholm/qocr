@@ -23,10 +23,8 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
-    { include-group = "gpu" },
     "huggingface-hub>=1.29.0",
     "onnxslim>=0.1.96",
-    "rapidocr>=3.9.2",
     "opencv-python>=5.0.0.93",
 ]
 
