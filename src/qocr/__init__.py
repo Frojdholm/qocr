@@ -3,6 +3,7 @@ from __future__ import annotations
 import pathlib
 
 from qocr.pipeline import OCRPipeline, OCRResult
+from qocr.rapid_to_markdown import to_markdown
 
 
 def convert(
@@ -34,12 +35,8 @@ def convert(
         return_single_char_box=return_single_char_box,
     )
 
-    for r in results:
-        print(f"[Orientation] {r.angle}° ({r.angle_score:.3f})")
-        print(f"[Text {r.score:.3f}] {r.text}")
-        if r.word_results:
-            words_desc = ", ".join(f"'{w.text}'({w.score:.3f})" for w in r.word_results)
-            print(f"  [Words] {words_desc}")
+    md = to_markdown(results)
+    print(md)
 
     if visualize and prob_map is not None:
         import cupy as cp
@@ -119,6 +116,11 @@ def main():
         action="store_true",
         help="Whether to return individual character-level boxes",
     )
+    parser.add_argument(
+        "--visualize",
+        action="store_true",
+        help="Visualize the OCR result",
+    )
 
     args = parser.parse_args()
 
@@ -132,4 +134,5 @@ def main():
         dict_path=pathlib.Path(args.dict_path) if args.dict_path else None,
         return_word_box=args.return_word_box,
         return_single_char_box=args.return_single_char_box,
+        visualize=args.visualize,
     )
