@@ -2,6 +2,33 @@
 
 set -eou pipefail
 
-hf download PaddlePaddle/PP-OCRv6_small_det_onnx --local-dir models/PaddlePaddle/PP-OCRv6_small_det_onnx
-hf download PaddlePaddle/PP-OCRv6_small_rec_onnx --local-dir models/PaddlePaddle/PP-OCRv6_small_rec_onnx
-hf download PaddlePaddle/PP-LCNet_x1_0_textline_ori_onnx --local-dir models/PaddlePaddle/PP-LCNet_x1_0_textline_ori_onnx
+# 1. Download PaddlePaddle ONNX models from Hugging Face
+uv run hf download PaddlePaddle/PP-OCRv6_small_det_onnx --local-dir models/PaddlePaddle/PP-OCRv6_small_det_onnx
+uv run hf download PaddlePaddle/PP-OCRv6_small_rec_onnx --local-dir models/PaddlePaddle/PP-OCRv6_small_rec_onnx
+uv run hf download PaddlePaddle/PP-LCNet_x1_0_textline_ori_onnx --local-dir models/PaddlePaddle/PP-LCNet_x1_0_textline_ori_onnx
+
+# 2. Upgrade rec model to opset 17 for fused LayerNormalization layers needed by tensorrt
+uv run python scripts/upgrade_rec_opset.py \
+    models/PaddlePaddle/PP-OCRv6_small_rec_onnx/inference.onnx \
+    models/rec/rec_model_17.onnx \
+    --target-opset 17
+
+# 3. Optimize models with onnxslim
+mkdir -p models/det models/cls models/rec
+
+uv run onnxslim \
+    models/PaddlePaddle/PP-OCRv6_small_det_onnx/inference.onnx \
+    models/det/det_model.onnx
+
+uv run onnxslim \
+    models/PaddlePaddle/PP-LCNet_x1_0_textline_ori_onnx/inference.onnx \
+    models/cls/cls_model.onnx
+
+uv run onnxslim \
+    models/rec/rec_model_17.onnx \
+    models/rec/rec_model.onnx
+
+# 4. Extract ppocrv6 dictionary from inference.yml
+uv run python scripts/extract_dict.py \
+    models/PaddlePaddle/PP-OCRv6_small_rec_onnx/inference.yml \
+    models/ppocrv6_dict.txt
